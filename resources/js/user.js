@@ -206,7 +206,9 @@ document.getElementById('editUserForm').onsubmit = function(event) {
             })
         })
         .then(response => {
+            console.log(response);
             if (response.ok) {
+                // Solo cierra el modal aquí
                 closeModal();
                 Swal.fire({
                     icon: 'success',
@@ -214,15 +216,16 @@ document.getElementById('editUserForm').onsubmit = function(event) {
                     showConfirmButton: false,
                     timer: 1500
                 }).then(() => {
-                    window.location.reload();
+                    window.location.reload(); // Recarga la página después de mostrar la alerta.
                 });
             } else if (response.status === 422) {
                 return response.json().then(data => {
+                    console.log(data); // Log para ver el contenido del error.
                     if (data.errors && data.errors.email) {
                         Swal.fire({
                             icon: 'error',
                             title: 'Error',
-                            text: 'Este correo ya ha sido registrado',
+                            text: data.errors.email[0] || 'Este correo ya ha sido registrado',
                         });
                     } else {
                         Swal.fire({
@@ -251,6 +254,8 @@ document.getElementById('editUserForm').onsubmit = function(event) {
             });
         });
     };
+    
+    
     
     // Función para filtrar usuarios
     function filterUsers() {

@@ -35,17 +35,18 @@ class UserController extends Controller
      * @return \Illuminate\Http\JsonResponse
      */
     public function store(Request $request)
-    {
-        // Validación
+{
+    // Validación
+    try {
         $validatedData = $request->validate([
             'name' => 'required|string|max:255',
             'apellido' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
+            'email' => 'required|string|email|max:255|unique:users', // Validación de correo único
             'telefono' => 'nullable|string|max:15',
             'password' => 'required|string|min:8',
         ]);
-    
-        // Creación del usuario
+
+        // Si la validación pasa, se crea el usuario
         User::create([
             'name' => $validatedData['name'],
             'apellido' => $validatedData['apellido'],
@@ -53,10 +54,19 @@ class UserController extends Controller
             'telefono' => $validatedData['telefono'],
             'password' => bcrypt($validatedData['password']),
         ]);
-    
+
         // Respuesta de éxito
         return response()->json(['message' => 'Usuario creado con éxito.'], 201);
+    } catch (\Illuminate\Validation\ValidationException $e) {
+        // Manejar errores de validación
+        return response()->json(['errors' => $e->validator->errors()], 422);
+    } catch (\Exception $e) {
+        // Manejar otros tipos de errores
+        return response()->json(['message' => 'Ocurrió un error al registrar el usuario.'], 500);
     }
+}
+
+
     
     /**
      * Muestra un usuario específico.
