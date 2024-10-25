@@ -8,4 +8,5 @@ export default defineConfig({
             refresh: true,
         }),
     ],
+    base: 'https://abm-usuarios-production.up.railway.app/', // URL base en HTTPS
 });
