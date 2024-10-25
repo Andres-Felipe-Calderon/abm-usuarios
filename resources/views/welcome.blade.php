@@ -23,8 +23,8 @@
             <div class="relative min-h-screen">
     <img id="background" class="absolute top-0 left-0 w-full h-full object-cover" src="{{ asset('images/fondo2.jpg') }}" />
     <div class="relative z-10 flex flex-col items-center justify-center h-full">
-    <header class="grid grid-cols-2 items-center gap-24 py-14 lg:grid-cols-3">
-                    <div class="flex lg:justify-center lg:col-start-2">
+    <header class="grid grid-cols-2 items-center gap-24 py-14 lg:grid-cols-3  w-[90%]">
+  <div class="flex lg:justify-center lg:col-start-2">
                         <svg class="h-12 w-auto text-white lg:h-16 lg:text-[#007BFF]" viewBox="0 0 62 65" fill="none"
                             xmlns="http://www.w3.org/2000/svg">
                             <path
@@ -33,9 +33,12 @@
                         </svg>
                     </div>
                     @if (Route::has('login'))
-                    <div class="ml-48"> <!-- Agregue ml-10 aquí -->
-            <livewire:welcome.navigation />
-        </div>
+                    <div class="flex justify-start items-start ml-1">
+    <livewire:welcome.navigation />
+</div>
+
+
+
                     @endif
 
                 </header>
