@@ -34,12 +34,12 @@ Ejecuta el siguiente comando para generar la clave de la aplicación:
 
 php artisan key:generate
 
-##Migrar la Base de Datos
+## Migrar la Base de Datos
  ejecuta:
 
 php artisan migrate
 
-##Levantar el Servidor de Desarrollo
+## Levantar el Servidor de Desarrollo
 Finalmente, puedes levantar el servidor de desarrollo con el siguiente comando:
 
 
