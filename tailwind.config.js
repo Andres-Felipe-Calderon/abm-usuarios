@@ -7,7 +7,10 @@ export default {
         './vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php',
         './storage/framework/views/*.php',
         './resources/views/**/*.blade.php',
+        './resources/js/**/*.js', // Asegúrate de incluir tus scripts aquí
+        './resources/**/*.vue', // Si usas Vue.js
     ],
+    
 
     theme: {
         extend: {
