@@ -12,7 +12,6 @@ Route::view('dashboard', 'dashboard')
 Route::view('profile', 'profile')
     ->middleware(['auth'])
     ->name('profile');
-    Route::put('/users/{id}', [UserController::class, 'update'])->name('users.update');
 
     Route::resource('users', UserController::class);
 
