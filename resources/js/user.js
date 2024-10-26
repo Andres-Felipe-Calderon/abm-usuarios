@@ -1,142 +1,90 @@
 document.addEventListener('DOMContentLoaded', function() {
-    // Función para abrir el modal
+    // Funciones para manejar el modal de usuario
     function openModal() {
         document.getElementById('userModal').classList.remove('hidden');
     }
 
-    // Función para cerrar el modal
     function closeModal() {
         document.getElementById('userModal').classList.add('hidden');
     }
+
     function openEditUserModal() {
         document.getElementById('editUserModal').classList.remove('hidden');
     }
 
-    // Función para cerrar el modal de editar usuario
     function closeEditModal() {
         document.getElementById('editUserModal').classList.add('hidden');
     }
-    window.closeEditModal = function() {
-        document.getElementById('editUserModal').classList.add('hidden');
-    };
-document.getElementById('editUserForm').onsubmit = function(event) {
-    event.preventDefault(); // Prevenir el envío por defecto del formulario
-    updateUser(); // Llama a la función para actualizar
-};
 
-    // Función para editar un usuario
-// Asegúrate de que esta función está en el ámbito global
-window.updateUser = function() {
-    const userId = document.getElementById('editUserId').value; 
- 
+    // Función para actualizar un usuario
+    function updateUser() {
+        const userId = document.getElementById('editUserId').value; 
+        const formData = new FormData(document.getElementById('editUserForm'));
+        const csrfToken = document.querySelector('input[name="_token"]').value;
 
-    const formData = new FormData(document.getElementById('editUserForm'));
-
-
-    const csrfToken = document.querySelector('input[name="_token"]').value;
-
-    if (!userId) {
-        console.error('No se encontró el ID del usuario');
-        // Usar SweetAlert para mostrar un mensaje de error
-        Swal.fire({
-            icon: 'error',
-            title: 'Error',
-            text: 'ID del usuario no encontrado.'
-        });
-        return;
-    }
-
-    fetch(`/users/${userId}`, { // Se usará la ruta del resource
-        method: 'POST',
-        body: formData,
-        headers: {
-            'X-CSRF-TOKEN': csrfToken 
-        }
-    })
-    .then(response => {
-        if (response.ok) {
-            return response.json();
-        } else {
-            return response.json().then(err => {
-                throw new Error(err.message || 'Error en la actualización');
+        if (!userId) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'ID del usuario no encontrado.'
             });
+            return;
         }
-    })
-    .then(result => {
-        // Usar SweetAlert para mostrar el mensaje de éxito
-        Swal.fire({
-            icon: 'success',
-            title: 'Éxito',
-            text: result.message || 'Usuario actualizado con éxito.'
-        });
-        closeEditModal(); 
-        location.reload(); 
-    })
-    .catch(error => {
-        console.error('Error al actualizar el usuario:', error);
-        // Usar SweetAlert para mostrar un mensaje de error
-        Swal.fire({
-            icon: 'error',
-            title: 'Error',
-            text: 'Error al actualizar el usuario: ' + error.message
-        });
-    });
-};
 
-
-// Función para abrir el modal de edición y cargar los datos del usuario
-// Función para abrir el modal de edición y cargar los datos del usuario
-window.editUser = function(userId) {
-    // Imprimir el userId que se recibe como parámetro    
-    fetch(`/users/${userId}/edit`)
-        .then(response => {
-    
-            return response.json();
+        fetch(`/users/${userId}`, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRF-TOKEN': csrfToken 
+            }
         })
-        .then(data => {
-      
-            
-            // Asigna el userId al campo oculto
-            document.getElementById('editUserId').value = userId; // Asigna el userId al campo oculto
-            document.getElementById('editName').value = data.name;
-            document.getElementById('editApellido').value = data.apellido;
-            document.getElementById('editEmail').value = data.email;
-            document.getElementById('editTelefono').value = data.telefono;
-
-            // Abre la modal de edición
-            openEditUserModal();
+        .then(response => {
+            if (response.ok) {
+                return response.json();
+            } else {
+                return response.json().then(err => {
+                    throw new Error(err.message || 'Error en la actualización');
+                });
+            }
+        })
+        .then(result => {
+            Swal.fire({
+                icon: 'success',
+                title: 'Éxito',
+                text: result.message || 'Usuario actualizado con éxito.'
+            });
+            closeEditModal(); 
+            location.reload(); 
         })
         .catch(error => {
-            console.error('Error al cargar los datos del usuario:', error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Error al actualizar el usuario: ' + error.message
+            });
         });
-};
+    }
 
-
-
-// Configura el evento de envío del formulario
-document.getElementById('editUserForm').onsubmit = function(event) {
-    event.preventDefault(); // Evita el envío por defecto del formulario
-
-    const userId = document.getElementById('editUserId').value; // Asegúrate de tener un campo oculto con el ID del usuario
-    updateUser(userId); // Llama a la función updateUser
-};
-
-
-    // Asignar el evento de envío al formulario de editar usuario
-    document.getElementById('editUserForm').onsubmit = function(e) {
-        e.preventDefault(); // Prevenir el envío por defecto
-        const userId = document.getElementById('editUserForm').action.split('/').pop(); // Obtener el ID del usuario
-        updateUser(userId); // Llama a la función para actualizar el usuario
+    // Función para editar un usuario
+    window.editUser = function(userId) {
+        fetch(`/users/${userId}/edit`)
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('editUserId').value = userId;
+                document.getElementById('editName').value = data.name;
+                document.getElementById('editApellido').value = data.apellido;
+                document.getElementById('editEmail').value = data.email;
+                document.getElementById('editTelefono').value = data.telefono;
+                openEditUserModal();
+            })
+            .catch(error => {
+                console.error('Error al cargar los datos del usuario:', error);
+            });
     };
-
-    // También puedes agregar los eventos de cierre aquí si es necesario
- 
 
     // Función para eliminar un usuario
     const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-
     window.deleteUser = function(userId) {
-        // Mostrar la alerta de confirmación utilizando SweetAlert2
         Swal.fire({
             title: '¿Estás seguro?',
             text: "No podrás revertir esto",
@@ -148,7 +96,6 @@ document.getElementById('editUserForm').onsubmit = function(event) {
             cancelButtonText: 'Cancelar'
         }).then((result) => {
             if (result.isConfirmed) {
-                // Si el usuario confirma, hacer la solicitud DELETE
                 fetch(`/users/${userId}`, {
                     method: 'DELETE',
                     headers: {
@@ -164,9 +111,7 @@ document.getElementById('editUserForm').onsubmit = function(event) {
                             text: 'El usuario ha sido eliminado.',
                             showConfirmButton: false,
                             timer: 1500
-                        }).then(() => {
-                            location.reload();  // Recargar la página después de eliminar
-                        });
+                        }).then(() => location.reload());
                     } else {
                         Swal.fire({
                             icon: 'error',
@@ -175,7 +120,7 @@ document.getElementById('editUserForm').onsubmit = function(event) {
                         });
                     }
                 })
-                .catch(error => {
+                .catch(() => {
                     Swal.fire({
                         icon: 'error',
                         title: 'Error',
@@ -185,11 +130,23 @@ document.getElementById('editUserForm').onsubmit = function(event) {
             }
         });
     };
-    
 
     // Evento de envío del formulario para agregar usuario
     document.getElementById('userForm').onsubmit = function(event) {
         event.preventDefault();
+    
+        // Validación de correo electrónico
+        const emailInput = this.email.value;
+        const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.(com|co)$/; // Permitir .com y .co
+        
+        if (!emailPattern.test(emailInput)) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Por favor, ingresa un correo válido que termine en .com o .co',
+            });
+            return; // Detiene el envío si el correo no es válido
+        }
     
         fetch(this.action, {
             method: 'POST',
@@ -206,35 +163,14 @@ document.getElementById('editUserForm').onsubmit = function(event) {
             })
         })
         .then(response => {
-            console.log(response);
             if (response.ok) {
-                // Solo cierra el modal aquí
                 closeModal();
                 Swal.fire({
                     icon: 'success',
                     title: 'Usuario registrado con éxito',
                     showConfirmButton: false,
                     timer: 1500
-                }).then(() => {
-                    window.location.reload(); // Recarga la página después de mostrar la alerta.
-                });
-            } else if (response.status === 422) {
-                return response.json().then(data => {
-                    console.log(data); // Log para ver el contenido del error.
-                    if (data.errors && data.errors.email) {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Error',
-                            text: data.errors.email[0] || 'Este correo ya ha sido registrado',
-                        });
-                    } else {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Error',
-                            text: data.message || 'Ocurrió un error al registrar el usuario.',
-                        });
-                    }
-                });
+                }).then(() => window.location.reload());
             } else {
                 return response.json().then(data => {
                     Swal.fire({
@@ -246,7 +182,6 @@ document.getElementById('editUserForm').onsubmit = function(event) {
             }
         })
         .catch(error => {
-            console.error('Error:', error);
             Swal.fire({
                 icon: 'error',
                 title: 'Error',
@@ -255,45 +190,44 @@ document.getElementById('editUserForm').onsubmit = function(event) {
         });
     };
     
-    
-    
+
     // Función para filtrar usuarios
     function filterUsers() {
         const input = document.getElementById('search');
         const filter = input.value.toLowerCase();
         const table = document.getElementById('usersTable');
-        const rows = table.getElementsByTagName('tr'); // Cambiado para incluir encabezados
+        const rows = table.getElementsByTagName('tr');
 
-
-
-        // Iterar sobre las filas de la tabla
-        for (let i = 1; i < rows.length; i++) { // Comienza en 1 para omitir el encabezado
+        for (let i = 1; i < rows.length; i++) {
             const cells = rows[i].getElementsByTagName('td');
             if (cells.length > 0) {
                 const nameText = cells[0].textContent || cells[0].innerText;
                 const emailText = cells[1].textContent || cells[1].innerText;
 
-                // Mostrar o ocultar la fila según el filtro
                 if (nameText.toLowerCase().indexOf(filter) > -1 || emailText.toLowerCase().indexOf(filter) > -1) {
-                    rows[i].style.display = ''; // Mostrar fila
+                    rows[i].style.display = ''; 
                 } else {
-                    rows[i].style.display = 'none'; // Ocultar fila
+                    rows[i].style.display = 'none'; 
                 }
             }
         }
     }
 
+    
     // Agregar un evento de entrada al campo de búsqueda
     const searchInput = document.getElementById('search');
     if (searchInput) {
         searchInput.addEventListener('input', filterUsers);
-    } else {
-        console.error('No se encontró el campo de búsqueda con ID "search".');
     }
-    // Agregar un evento de entrada al campo de búsqueda
-    document.getElementById('search').addEventListener('input', filterUsers);
 
-    // Exponer las funciones para que puedan ser accedidas desde el HTML
+    // Exponer funciones para que puedan ser accedidas desde el HTML
     window.openModal = openModal;
     window.closeModal = closeModal;
+    window.closeEditModal = closeEditModal;
+
+    // Configura el evento de envío del formulario de edición de usuario
+    document.getElementById('editUserForm').onsubmit = function(event) {
+        event.preventDefault();
+        updateUser();
+    };
 });

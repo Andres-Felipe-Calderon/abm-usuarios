@@ -13,7 +13,10 @@ Route::view('profile', 'profile')
     ->middleware(['auth'])
     ->name('profile');
 
+// Protege todas las rutas de 'users' con el middleware de autenticación
+Route::middleware(['auth'])->group(function () {
     Route::resource('users', UserController::class);
-
+});
 
 require __DIR__.'/auth.php';
+
